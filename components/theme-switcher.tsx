@@ -8,9 +8,9 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { Laptop, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
-import { FaLaptop, FaRegMoon, FaRegSun } from 'react-icons/fa6'
 
 const ThemeSwitcher = () => {
   const [mounted, setMounted] = useState(false)
@@ -31,19 +31,19 @@ const ThemeSwitcher = () => {
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' size={'sm'}>
           {theme === 'light' ? (
-            <FaRegSun
+            <Sun
               key='light'
               size={ICON_SIZE}
               className={'text-muted-foreground'}
             />
           ) : theme === 'dark' ? (
-            <FaRegMoon
+            <Moon
               key='dark'
               size={ICON_SIZE}
               className={'text-muted-foreground'}
             />
           ) : (
-            <FaLaptop
+            <Laptop
               key='system'
               size={ICON_SIZE}
               className={'text-muted-foreground'}
@@ -57,15 +57,15 @@ const ThemeSwitcher = () => {
           onValueChange={(e) => setTheme(e)}
         >
           <DropdownMenuRadioItem className='flex gap-2' value='light'>
-            <FaRegSun size={ICON_SIZE} className='text-muted-foreground' />{' '}
+            <Sun size={ICON_SIZE} className='text-muted-foreground' />{' '}
             <span>Light</span>
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem className='flex gap-2' value='dark'>
-            <FaRegMoon size={ICON_SIZE} className='text-muted-foreground' />{' '}
+            <Moon size={ICON_SIZE} className='text-muted-foreground' />{' '}
             <span>Dark</span>
           </DropdownMenuRadioItem>
           <DropdownMenuRadioItem className='flex gap-2' value='system'>
-            <FaLaptop size={ICON_SIZE} className='text-muted-foreground' />{' '}
+            <Laptop size={ICON_SIZE} className='text-muted-foreground' />{' '}
             <span>System</span>
           </DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>

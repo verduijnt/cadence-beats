@@ -53,6 +53,8 @@ const config = {
           foreground: 'hsl(var(--card-foreground))',
         },
         'chart-1': 'hsl(var(--chart-1))',
+        spotify: 'hsl(var(--spotify))',
+        strava: 'hsl(var(--strava))',
       },
       borderRadius: {
         lg: 'var(--radius)',

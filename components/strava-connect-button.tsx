@@ -17,8 +17,8 @@ const handleConnectStrava = async () => {
 
 function StravaConnectButton() {
   return (
-    <Button onClick={handleConnectStrava}>
-      <FaStrava className='mr-2 text-chart-1' />
+    <Button onClick={handleConnectStrava} size='lg'>
+      <FaStrava className='mr-2 text-strava text-lg' />
       Connect Strava
     </Button>
   )

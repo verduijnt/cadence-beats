@@ -33,12 +33,14 @@ export default function RootLayout({
             <div className='flex-1 w-full flex flex-col gap-20 items-center'>
               <nav className='w-full flex justify-center border-b border-b-foreground/10 h-16'>
                 <div className='w-full max-w-5xl flex justify-between items-center p-3 px-5'>
-                  <div className='flex items-center font-semibold'>
-                    <Link href={'/'}>Cadence Beats</Link>
+                  <div className='flex items-center font-semibold text-3xl'>
+                    <Link href={'/'} className='text-strava'>
+                      Cadence <span className='text-spotify'>Beats</span>
+                    </Link>
                   </div>
                   <div className='ml-auto items-center flex gap-2'>
-                    <ThemeSwitcher />
                     <HeaderAuth />
+                    <ThemeSwitcher />
                   </div>
                 </div>
               </nav>

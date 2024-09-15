@@ -5,22 +5,18 @@ import LoginButton from './login-button'
 import Link from 'next/link'
 
 export default async function AuthButton() {
+  const supabase = createClient()
   const {
     data: { user },
-  } = await createClient().auth.getUser()
-
-  let displayName = ''
-  if (!!user) {
-    displayName = user.user_metadata.full_name ?? user.email
-  }
+  } = await supabase.auth.getUser()
 
   return user ? (
     <div className='flex items-center gap-4'>
-      <Button asChild>
+      <Button asChild size='lg' className='text-lg'>
         <Link href='/dashboard'>Dashboard</Link>
       </Button>
       <form action={signOutAction}>
-        <Button type='submit' variant={'outline'}>
+        <Button type='submit' variant={'outline'} size='lg' className='text-lg'>
           Sign out
         </Button>
       </form>
