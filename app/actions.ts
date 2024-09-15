@@ -33,6 +33,29 @@ export const getStravaTokens = async (code: string) => {
   })
 
   const data = await response.json()
+  console.log(data)
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  console.log(user)
+
+  if (!user) {
+    throw new Error('user is undefined')
+  }
+
+  const { error } = await supabase
+    .from('user_tokens')
+    .update({
+      strava_access_token: data.access_token,
+      strava_refresh_token: data.refresh_token,
+    })
+    .eq('user_id', user.id)
+
+  if (error) {
+    throw new Error(`Error: ${error.message}`)
+  }
+
   return data
 }
 

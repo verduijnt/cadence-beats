@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans'
 import { ThemeProvider } from 'next-themes'
 import Link from 'next/link'
 import './globals.css'
+import { FaHeart } from 'react-icons/fa6'
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -44,8 +45,11 @@ export default function RootLayout({
               <div className='flex flex-col gap-20 max-w-5xl p-5'>
                 {children}
               </div>
-
-              <footer className='w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16'></footer>
+              <footer className='w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-2 py-16'>
+                Build with
+                <FaHeart className='text-chart-1' />
+                by Terry Verduijn
+              </footer>
             </div>
           </main>
         </ThemeProvider>

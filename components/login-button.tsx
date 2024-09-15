@@ -11,7 +11,7 @@ const handleSpotifyLogin = async () => {
     provider: 'spotify',
     options: {
       scopes: 'user-read-email playlist-modify-public playlist-modify-private',
-      redirectTo: 'http://localhost:3000/auth/callback', // Redirect after login
+      redirectTo: 'http://localhost:3000/auth/callback?next=/dashboard', // Redirect after login
     },
   })
   if (error) {
@@ -22,7 +22,7 @@ const handleSpotifyLogin = async () => {
 export default function LoginButton() {
   return (
     <Button size='sm' onClick={handleSpotifyLogin}>
-      <FaSpotify className='mr-2 text-chart-2' />
+      <FaSpotify className='mr-2 text-chart-1' />
       Sign in with Spotify
     </Button>
   )
