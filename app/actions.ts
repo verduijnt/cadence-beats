@@ -1,5 +1,6 @@
 'use server'
 
+import { UserTokens } from '@/interfaces/userTokens'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 
@@ -18,6 +19,41 @@ export const connectStrava = async () => {
   return redirect(stravaAuthUrl)
 }
 
+const refreshStravaToken = async (refreshToken: string) => {
+  const response = await fetch('https://www.strava.com/oauth/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      client_id: process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID,
+      client_secret: process.env.NEXT_PUBLIC_STRAVA_CLIENT_SECRET,
+      refreshToken,
+      grant_type: 'refresh_token',
+    }),
+  })
+
+  const data = await response.json()
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  console.log(data)
+  const { error } = await supabase
+    .from('user_tokens')
+    .update({
+      strava_access_token: data.access_token,
+      strava_refresh_token: data.refresh_token,
+    })
+    .eq('user_id', user!.id)
+
+  if (error) {
+    throw new Error(`Error: ${error.message}`)
+  }
+
+  return data
+}
+
 export const getStravaTokens = async (code: string) => {
   const response = await fetch('https://www.strava.com/oauth/token', {
     method: 'POST',
@@ -33,12 +69,10 @@ export const getStravaTokens = async (code: string) => {
   })
 
   const data = await response.json()
-  console.log(data)
   const supabase = createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  console.log(user)
 
   if (!user) {
     throw new Error('user is undefined')
@@ -63,12 +97,26 @@ export const getStravaActivities = async (
   accessToken: string,
   count: number
 ) => {
+  const supabase = createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const { data: userTokens } = await supabase
+    .from('user_tokens')
+    .select()
+    .eq('user_id', user?.id)
+    .limit(1)
+    .returns<UserTokens[]>()
+
+  console.log(userTokens)
+
   const response = await fetch(
     `https://www.strava.com/api/v3/athlete/activities?per_page=${count}`,
     {
       method: 'GET',
       headers: {
-        Authorization: `Bearer ${accessToken}`,
+        Authorization: `Bearer ${userTokens?.[0].strava_access_token}`,
       },
     }
   )
@@ -76,6 +124,12 @@ export const getStravaActivities = async (
   const data = await response.json()
 
   if (!response.ok) {
+    if (data.message === 'Authorization Error') {
+      refreshStravaToken(userTokens?.[0].strava_refresh_token!)
+      getStravaActivities('', count)
+      return
+    }
+    console.log(data)
     throw new Error(`Error: ${data.message}`)
   }
 
@@ -97,4 +151,45 @@ export const calculateAverageCadence = (activities: any): number => {
   const average = totalCadence / filteredActivities.length
   console.log(average)
   return average
+}
+
+export const authenticateSpotify = async (): Promise<any> => {
+  try {
+    const response = await fetch('/api/spotify/authenticate', {
+      method: 'POST',
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to authenticate with Spotify')
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export const getGenres = async (accessToken: string): Promise<any> => {
+  try {
+    const response = await fetch('/api/spotify/getGenres', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(
+        'An error occurred while retrieving the genres, please try again'
+      )
+    }
+
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error(error)
+    return null
+  }
 }
