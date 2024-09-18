@@ -15,14 +15,7 @@ export async function GET(request: Request) {
 
   if (code) {
     console.log(code)
-    const tokens = await getStravaTokens(code)
-    // console.log(tokens)
-
-    const activities = await getStravaActivities(tokens.access_token, 30)
-    // console.log(activities)
-
-    const averageCadence = calculateAverageCadence(activities)
-    // console.log(averageCadence)
+    await getStravaTokens(code)
   }
 
   // URL to redirect to after sign up process completes

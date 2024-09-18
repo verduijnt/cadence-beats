@@ -12,11 +12,11 @@ export default async function AuthButton() {
 
   return user ? (
     <div className='flex items-center gap-4'>
-      <Button asChild size='lg' className='text-lg'>
+      <Button asChild>
         <Link href='/dashboard'>Dashboard</Link>
       </Button>
       <form action={signOutAction}>
-        <Button type='submit' variant={'outline'} size='lg' className='text-lg'>
+        <Button type='submit' variant={'outline'}>
           Sign out
         </Button>
       </form>

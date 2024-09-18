@@ -1,5 +1,6 @@
 'use server'
 
+import { Activity } from '@/interfaces/activities'
 import { UserTokens } from '@/interfaces/userTokens'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
@@ -28,7 +29,7 @@ const refreshStravaToken = async (refreshToken: string) => {
     body: JSON.stringify({
       client_id: process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID,
       client_secret: process.env.NEXT_PUBLIC_STRAVA_CLIENT_SECRET,
-      refreshToken,
+      refresh_token: refreshToken,
       grant_type: 'refresh_token',
     }),
   })
@@ -69,6 +70,7 @@ export const getStravaTokens = async (code: string) => {
   })
 
   const data = await response.json()
+  console.log(data)
   const supabase = createClient()
   const {
     data: { user },
@@ -94,9 +96,8 @@ export const getStravaTokens = async (code: string) => {
 }
 
 export const getStravaActivities = async (
-  accessToken: string,
   count: number
-) => {
+): Promise<Activity[] | undefined> => {
   const supabase = createClient()
   const {
     data: { user },
@@ -108,8 +109,6 @@ export const getStravaActivities = async (
     .eq('user_id', user?.id)
     .limit(1)
     .returns<UserTokens[]>()
-
-  console.log(userTokens)
 
   const response = await fetch(
     `https://www.strava.com/api/v3/athlete/activities?per_page=${count}`,
@@ -126,14 +125,13 @@ export const getStravaActivities = async (
   if (!response.ok) {
     if (data.message === 'Authorization Error') {
       refreshStravaToken(userTokens?.[0].strava_refresh_token!)
-      getStravaActivities('', count)
+      getStravaActivities(count)
       return
     }
-    console.log(data)
     throw new Error(`Error: ${data.message}`)
   }
 
-  return data
+  return data as Activity[]
 }
 
 export const calculateAverageCadence = (activities: any): number => {

@@ -1,3 +1,5 @@
+'use client'
+
 import { FaStrava } from 'react-icons/fa6'
 import { Button } from './ui/button'
 import { connectStrava } from '@/app/actions'
