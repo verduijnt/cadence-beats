@@ -17,6 +17,7 @@ export default async function DashboardPage() {
     data: { session },
   } = await supabase.auth.getSession()
 
+  console.log(session)
   if (!user || !session) {
     return redirect('/sign-in')
   }

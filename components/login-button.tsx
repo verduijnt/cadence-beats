@@ -10,7 +10,8 @@ const handleSpotifyLogin = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'spotify',
     options: {
-      scopes: 'user-read-email playlist-modify-public playlist-modify-private',
+      scopes:
+        'user-read-private user-read-email playlist-modify-public playlist-modify-private',
       redirectTo: 'http://localhost:3000/auth/callback?next=/dashboard', // Redirect after login
     },
   })
