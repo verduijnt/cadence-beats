@@ -14,7 +14,6 @@ export async function GET(request: Request) {
   const origin = requestUrl.origin
 
   if (code) {
-    console.log(code)
     await getStravaTokens(code)
   }
 

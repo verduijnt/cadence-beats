@@ -15,15 +15,6 @@ import {
 } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {
   Table,
   TableBody,
   TableCell,
@@ -50,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from './ui/select'
+import { formatDistance, formatTime } from '@/utils/utils'
 
 export const columns: ColumnDef<Activity>[] = [
   {
@@ -102,46 +94,79 @@ export const columns: ColumnDef<Activity>[] = [
   },
   {
     accessorKey: 'average_cadence',
-    header: 'Average Cadence',
+    header: ({ column }) => {
+      return (
+        <div
+          className='flex cursor-pointer'
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Average Cadence
+          {column.getIsSorted() === 'asc' ? (
+            <LucideChevronDown className='ml-2 h-4 w-4' />
+          ) : column.getIsSorted() === 'desc' ? (
+            <LucideChevronUp className='ml-2 h-4 w-4' />
+          ) : (
+            <LucideChevronsUpDown className='ml-2 h-4 w-4' />
+          )}
+        </div>
+      )
+    },
     cell: ({ row }) => <div>{row.getValue('average_cadence')}</div>,
   },
   {
     accessorKey: 'distance',
-    header: 'Distance',
-    cell: ({ row }) => <div>{row.getValue('distance')}</div>,
+    header: 'Distance (in km)',
+    cell: ({ row }) => <div>{formatDistance(row.getValue('distance'))}</div>,
   },
   {
     accessorKey: 'moving_time',
     header: 'Moving Time',
-    cell: ({ row }) => <div>{row.getValue('moving_time')}</div>,
+    cell: ({ row }) => <div>{formatTime(row.getValue('moving_time'))}</div>,
   },
   {
     accessorKey: 'elapsed_time',
     header: 'Elapsed Time',
-    cell: ({ row }) => <div>{row.getValue('elapsed_time')}</div>,
+    cell: ({ row }) => <div>{formatTime(row.getValue('elapsed_time'))}</div>,
   },
 ]
 
 export default function StravaActivities() {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [activities, setActivities] = useState<Activity[]>([])
+  const [averageCadence, setAverageCadence] = useState<string | undefined>(
+    undefined
+  )
 
-  useEffect(() => {
-    const fetchActivities = async () => {
-      const latestActivities = await getStravaActivities(30)
-      if (latestActivities) {
-        setActivities(latestActivities)
-        setIsLoading(false)
-      }
+  const fetchActivities = async () => {
+    setIsLoading(true)
+    const latestActivities = await getStravaActivities(30)
+    if (latestActivities) {
+      setActivities(latestActivities)
+      setIsLoading(false)
     }
-
-    fetchActivities()
-  }, [])
+  }
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+
+  useEffect(() => {
+    const selectedRows = table.getSelectedRowModel().rows
+    const cadenceValues = selectedRows.map(
+      (row) => row.getValue('average_cadence') as number
+    )
+
+    const totalSum = cadenceValues.reduce(
+      (sum: number, value: number) => sum + value,
+      0
+    )
+
+    const averageCadence =
+      cadenceValues.length > 0 ? totalSum / cadenceValues.length : 0
+
+    setAverageCadence(averageCadence.toFixed(2))
+  }, [rowSelection])
 
   const table = useReactTable({
     data: activities,
@@ -168,18 +193,43 @@ export default function StravaActivities() {
     },
   })
 
+  const calculateAverage = () => {
+    console.log(table.getSelectedRowModel())
+    console.log(table.getSelectedRowModel().rows)
+    console.log(table.getSelectedRowModel().rows[0].getValue('average_cadence'))
+    const selectedRows = table.getSelectedRowModel().rows
+    const cadenceValues = selectedRows.map(
+      (row) => row.getValue('average_cadence') as number
+    )
+
+    const totalSum = cadenceValues.reduce(
+      (sum: number, value: number) => sum + value,
+      0
+    )
+
+    const averageCadence =
+      cadenceValues.length > 0 ? totalSum / cadenceValues.length : 0
+
+    console.log(averageCadence)
+  }
+
   return (
-    <>
-      <div>
-        {isLoading ? (
-          <div>Loading recent activities...</div>
-        ) : (
+    <div>
+      {activities.length === 0 && !isLoading && (
+        <Button onClick={fetchActivities}>Get latest Strava activities</Button>
+      )}
+      {isLoading ? (
+        <div>Loading recent activities...</div>
+      ) : (
+        activities.length > 0 && (
           <>
             <div>Activities</div>
             <div className='flex items-center py-4'>
               <Select
                 onValueChange={(value) =>
-                  table.getColumn('type')?.setFilterValue(value)
+                  table
+                    .getColumn('type')
+                    ?.setFilterValue(value === 'all' ? '' : value)
                 }
               >
                 <SelectTrigger className='w-[180px]'>
@@ -188,6 +238,7 @@ export default function StravaActivities() {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Types</SelectLabel>
+                    <SelectItem value='all'>All</SelectItem>
                     {activities
                       .map((item) => item.type)
                       .filter(
@@ -252,9 +303,10 @@ export default function StravaActivities() {
                 </TableBody>
               </Table>
             </div>
+            <div>Average Cadence: {averageCadence}</div>
           </>
-        )}
-      </div>
-    </>
+        )
+      )}
+    </div>
   )
 }

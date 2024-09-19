@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { GenrePicker } from '@/components/genre-picker'
 import StravaActivities from '@/components/strava-activities'
 import { UserTokens } from '@/interfaces/userTokens'
+import { Button } from '@/components/ui/button'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -21,12 +22,13 @@ export default async function DashboardPage() {
     .select()
     .limit(1)
     .returns<UserTokens[]>()
+
   const showConnectWithStrava =
     !userTokens?.[0]?.strava_access_token ||
     !userTokens?.[0]?.strava_refresh_token
 
   return (
-    <div className='flex-1 w-full flex flex-col gap-12'>
+    <div className='flex flex-col gap-12'>
       {showConnectWithStrava && <ConnectWithStrava />}
       <GenrePicker />
       {!showConnectWithStrava && <StravaActivities />}

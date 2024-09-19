@@ -39,7 +39,6 @@ const refreshStravaToken = async (refreshToken: string) => {
   const {
     data: { user },
   } = await supabase.auth.getUser()
-  console.log(data)
   const { error } = await supabase
     .from('user_tokens')
     .update({
@@ -70,7 +69,6 @@ export const getStravaTokens = async (code: string) => {
   })
 
   const data = await response.json()
-  console.log(data)
   const supabase = createClient()
   const {
     data: { user },
@@ -121,7 +119,6 @@ export const getStravaActivities = async (
   )
 
   const data = await response.json()
-
   if (!response.ok) {
     if (data.message === 'Authorization Error') {
       refreshStravaToken(userTokens?.[0].strava_refresh_token!)
@@ -131,23 +128,19 @@ export const getStravaActivities = async (
     throw new Error(`Error: ${data.message}`)
   }
 
-  return data as Activity[]
+  const filteredActivities = data.filter(
+    (activity: Activity) => !!activity.average_cadence
+  )
+
+  return filteredActivities as Activity[]
 }
 
 export const calculateAverageCadence = (activities: any): number => {
-  console.log(activities[0])
-  activities.forEach((activity: any) => {
-    console.log(`${activity.average_cadence} - ${activity.name}`)
-  })
-  const filteredActivities = activities.filter(
-    (activity: any) => !!activity.average_cadence
-  )
-  const totalCadence = filteredActivities.reduce(
+  const totalCadence = activities.reduce(
     (acc: any, activity: any) => acc + activity.average_cadence,
     0
   )
-  const average = totalCadence / filteredActivities.length
-  console.log(average)
+  const average = totalCadence / activities.length
   return average
 }
 
