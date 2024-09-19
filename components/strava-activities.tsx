@@ -193,26 +193,6 @@ export default function StravaActivities() {
     },
   })
 
-  const calculateAverage = () => {
-    console.log(table.getSelectedRowModel())
-    console.log(table.getSelectedRowModel().rows)
-    console.log(table.getSelectedRowModel().rows[0].getValue('average_cadence'))
-    const selectedRows = table.getSelectedRowModel().rows
-    const cadenceValues = selectedRows.map(
-      (row) => row.getValue('average_cadence') as number
-    )
-
-    const totalSum = cadenceValues.reduce(
-      (sum: number, value: number) => sum + value,
-      0
-    )
-
-    const averageCadence =
-      cadenceValues.length > 0 ? totalSum / cadenceValues.length : 0
-
-    console.log(averageCadence)
-  }
-
   return (
     <div>
       {activities.length === 0 && !isLoading && (
@@ -226,11 +206,11 @@ export default function StravaActivities() {
             <div>Activities</div>
             <div className='flex items-center py-4'>
               <Select
-                onValueChange={(value) =>
+                onValueChange={(value) => {
                   table
                     .getColumn('type')
                     ?.setFilterValue(value === 'all' ? '' : value)
-                }
+                }}
               >
                 <SelectTrigger className='w-[180px]'>
                   <SelectValue placeholder='Select a type' />
