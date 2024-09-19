@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation'
 import { GenrePicker } from '@/components/genre-picker'
 import StravaActivities from '@/components/strava-activities'
 import { UserTokens } from '@/interfaces/userTokens'
-import { Button } from '@/components/ui/button'
+import TestSpotify from '@/components/test-spotify'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -13,7 +13,11 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (!user) {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!user || !session) {
     return redirect('/sign-in')
   }
 
@@ -31,7 +35,12 @@ export default async function DashboardPage() {
     <div className='flex flex-col gap-12'>
       {showConnectWithStrava && <ConnectWithStrava />}
       <GenrePicker />
-      {!showConnectWithStrava && <StravaActivities />}
+      {!showConnectWithStrava && (
+        <>
+          <StravaActivities />
+          <TestSpotify accessToken={session.provider_token!} />
+        </>
+      )}
     </div>
   )
 }
