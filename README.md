@@ -36,15 +36,14 @@ Cadence Beats is an innovative app designed for athletes who want to sync their 
    npm install
    ```
 3. Set up environment variables:
-   - Create a `.env.local` file in the root of your project and add your API keys and secrets:
-     ```bash
-     NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-     NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-     NEXT_PUBLIC_SPOTIFY_CLIENT_ID=your-spotify-client-id
-     NEXT_PUBLIC_SPOTIFY_CLIENT_SECRET=your-spotify-client-secret
-     NEXT_PUBLIC_STRAVA_CLIENT_ID=your-strava-client-id
-     NEXT_PUBLIC_STRAVA_CLIENT_SECRET=your-strava-client-secret
-     ```
+   Create a `.env.local` file in the root of your project and add your API keys and secrets:
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   NEXT_PUBLIC_STRAVA_CLIENT_ID=your-strava-client-id
+   NEXT_PUBLIC_STRAVA_CLIENT_SECRET=your-strava-client-secret
+   NEXT_PUBLIC_STRAVA_REDIRECT_URI=your-strava-callback-url
+   ```
 4. Run the development server:
    ```bash
    npm run dev
