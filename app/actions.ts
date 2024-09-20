@@ -184,3 +184,107 @@ export const getGenres = async (accessToken: string): Promise<any> => {
     return null
   }
 }
+
+export const getLoggedInSpotifyUser = async (accessToken: string) => {
+  try {
+    const meResponse = await fetch('https://api.spotify.com/v1/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    const meData = await meResponse.json()
+    console.log(meData)
+    return meData
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export const getSpotifyTrackRecommendations = async (
+  accessToken: string,
+  genres: string[],
+  cadence: number
+) => {
+  try {
+    const params = new URLSearchParams({
+      seed_genres: genres.join(','),
+      min_tempo: (cadence - 2).toString(),
+      max_tempo: (cadence + 2).toString(),
+      limit: '50',
+    })
+
+    const tracksResponse = await fetch(
+      `https://api.spotify.com/v1/recommendations?${params.toString()}`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    )
+    const tracksData = await tracksResponse.json()
+    console.log(tracksData)
+    return tracksData
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export const createSpotifyPlaylist = async (
+  accessToken: string,
+  userId: string,
+  playlistName: string,
+  playlistDescription: string,
+  isPublic: boolean
+) => {
+  try {
+    const createPlaylistResponse = await fetch(
+      `https://api.spotify.com/v1/users/${userId}/playlists`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          name: playlistName,
+          description: playlistDescription,
+          public: isPublic,
+        }),
+      }
+    )
+    const playlistData = await createPlaylistResponse.json()
+    console.log(playlistData)
+    return playlistData
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+
+export const addSpotifyTracksToPlaylist = async (
+  accessToken: string,
+  playlistId: string,
+  trackUris: string[]
+) => {
+  try {
+    const addTracksResponse = await fetch(
+      `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          uris: trackUris,
+        }),
+      }
+    )
+    const addTracksData = await addTracksResponse.json()
+    console.log(addTracksData)
+    return addTracksData
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
