@@ -1,4 +1,4 @@
-<h1><span style="color: green;">Cadence </span><span style="color: orange;">Beats</span></h1>
+# Cadence Beats
 
 _A Supabase Hackathon project_
 
