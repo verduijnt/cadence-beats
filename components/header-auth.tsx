@@ -12,7 +12,10 @@ export default async function AuthButton() {
 
   return user ? (
     <div className='flex items-center gap-4'>
-      <Button asChild>
+      <Button
+        asChild
+        className='hover:bg-spotify hover:text-black bg-strava text-white'
+      >
         <Link href='/dashboard'>Dashboard</Link>
       </Button>
       <form action={signOutAction}>

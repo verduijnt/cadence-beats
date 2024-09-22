@@ -39,3 +39,14 @@ export function formatDistance(distance: string | number) {
   const formattedDistance = numericDistance / 1000
   return formattedDistance.toFixed(2)
 }
+
+export function formatSongDuration(milliseconds: number) {
+  // Get total minutes and seconds from milliseconds
+  const minutes = Math.floor(milliseconds / 60000)
+  const seconds = Math.floor((milliseconds % 60000) / 1000)
+
+  // Ensure seconds are always two digits by padding with a leading zero if necessary
+  const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+
+  return formattedTime
+}

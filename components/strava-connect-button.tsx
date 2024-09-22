@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from './ui/dialog'
+import { useState } from 'react'
 
 const handleConnectStrava = async () => {
   connectStrava()

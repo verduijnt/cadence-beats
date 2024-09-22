@@ -22,32 +22,39 @@ import { Check, XIcon } from 'lucide-react'
 import { Badge } from './ui/badge'
 import { spotifyGenres } from '@/utils/constants'
 
-export function GenrePicker() {
+export function GenrePicker({
+  selectedGenres,
+  setSelectedGenres,
+}: {
+  selectedGenres: string[]
+  setSelectedGenres: (data: string[]) => void
+}) {
   const [open, setOpen] = useState(false)
   const [disabled, setDisabled] = useState(false)
-  const [selectedValues, setSelectedValues] = useState<string[]>([])
 
   const handleSelect = (currentValue: string) => {
-    setSelectedValues((prevSelected) =>
+    const selectedGenres = (prevSelected: string[]) =>
       prevSelected.includes(currentValue)
         ? prevSelected.filter((value) => value !== currentValue)
         : [...prevSelected, currentValue]
-    )
+
+    setSelectedGenres(selectedGenres as unknown as string[])
+    setOpen(false)
   }
 
   useEffect(() => {
-    if (selectedValues.length === 5) {
+    if (selectedGenres.length === 5) {
       setOpen(false)
       setDisabled(true)
       return
     }
 
     setDisabled(false)
-  }, [selectedValues])
+  }, [selectedGenres])
 
   return (
     <>
-      <div className='flex items-start gap-4'>
+      <div className='gap-4'>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button
@@ -80,7 +87,7 @@ export function GenrePicker() {
                       <Check
                         className={cn(
                           'ml-auto h-4 w-4',
-                          selectedValues.find((value) => value === genre)
+                          selectedGenres.find((value) => value === genre)
                             ? 'opacity-100'
                             : 'opacity-0'
                         )}
@@ -92,34 +99,28 @@ export function GenrePicker() {
             </Command>
           </PopoverContent>
         </Popover>
-        <div className='w-[250px]'>
-          <h3>Selected genres:</h3>
-          <div className='space-y-2'>
-            {selectedValues.map((currentValue, index) => (
-              <div key={index}>
-                <Badge variant='outline' className='w-[250px]'>
-                  <span className='text-lg'>{currentValue}</span>
-                  <Button
-                    className='h-6 w-6 ml-auto'
-                    variant='link'
-                    size='icon'
-                    onClick={() =>
-                      setSelectedValues((prevSelected) =>
-                        prevSelected.includes(currentValue)
-                          ? prevSelected.filter(
-                              (value) => value !== currentValue
-                            )
-                          : [...prevSelected, currentValue]
-                      )
-                    }
-                  >
-                    <XIcon className='h-6 w-6' />
-                  </Button>
-                </Badge>
-              </div>
-            ))}
+        {selectedGenres && selectedGenres.length > 0 && (
+          <div className='w-[250px] mt-8'>
+            <h3>Selected genres:</h3>
+            <div className='space-y-2'>
+              {selectedGenres.map((currentValue, index) => (
+                <div key={index}>
+                  <Badge variant='outline' className='w-[250px]'>
+                    <span className='text-lg'>{currentValue}</span>
+                    <Button
+                      className='h-6 w-6 ml-auto'
+                      variant='link'
+                      size='icon'
+                      onClick={() => handleSelect(currentValue)}
+                    >
+                      <XIcon className='h-6 w-6' />
+                    </Button>
+                  </Badge>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </>
   )

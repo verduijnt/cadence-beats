@@ -22,8 +22,8 @@ const handleSpotifyLogin = async () => {
 
 export default function LoginButton() {
   return (
-    <Button size='lg' onClick={handleSpotifyLogin} className='text-md'>
-      <FaSpotify className='mr-2 text-spotify h-[32px] w-[32px]' />
+    <Button onClick={handleSpotifyLogin} className='text-md'>
+      <FaSpotify className='mr-2 text-spotify h-[28px] w-[28px]' />
       Sign in with Spotify
     </Button>
   )

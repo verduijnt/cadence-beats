@@ -1,14 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { UserTokens } from '@/interfaces/userTokens'
+import CreatePlaylist from '@/components/create-playlist'
 import ConnectWithStrava from '@/components/strava-connect-button'
-import MyPlaylists from '@/components/my-playlists'
 
-export default async function DashboardPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | string[] | undefined }
-}) {
+export default async function NewPlaylist() {
   const supabase = createClient()
 
   const {
@@ -36,7 +32,9 @@ export default async function DashboardPage({
   return (
     <div className='flex flex-col gap-12'>
       {showConnectWithStrava && <ConnectWithStrava />}
-      <MyPlaylists searchParams={searchParams} />
+      {!showConnectWithStrava && (
+        <CreatePlaylist spotifyAccessToken={session.provider_token!} />
+      )}
     </div>
   )
 }

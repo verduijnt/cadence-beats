@@ -1,6 +1,11 @@
 'use server'
 
 import { Activity } from '@/interfaces/activities'
+import {
+  SpotifyError,
+  SpotifyPlaylist,
+  SpotifyTrack,
+} from '@/interfaces/spotify'
 import { UserTokens } from '@/interfaces/userTokens'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
@@ -144,24 +149,6 @@ export const calculateAverageCadence = (activities: any): number => {
   return average
 }
 
-export const authenticateSpotify = async (): Promise<any> => {
-  try {
-    const response = await fetch('/api/spotify/authenticate', {
-      method: 'POST',
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to authenticate with Spotify')
-    }
-
-    const data = await response.json()
-    return data
-  } catch (error) {
-    console.error(error)
-    return null
-  }
-}
-
 export const getGenres = async (accessToken: string): Promise<any> => {
   try {
     const response = await fetch('/api/spotify/getGenres', {
@@ -185,33 +172,19 @@ export const getGenres = async (accessToken: string): Promise<any> => {
   }
 }
 
-export const getLoggedInSpotifyUser = async (accessToken: string) => {
-  try {
-    const meResponse = await fetch('https://api.spotify.com/v1/me', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    })
-    const meData = await meResponse.json()
-    console.log(meData)
-    return meData
-  } catch (error) {
-    console.error(error)
-    return null
-  }
-}
+export const getLoggedInSpotifyUser = async (accessToken: string) => {}
 
 export const getSpotifyTrackRecommendations = async (
   accessToken: string,
   genres: string[],
   cadence: number
-) => {
+): Promise<SpotifyTrack[] | undefined> => {
   try {
     const params = new URLSearchParams({
       seed_genres: genres.join(','),
       min_tempo: (cadence - 2).toString(),
       max_tempo: (cadence + 2).toString(),
-      limit: '50',
+      limit: '25',
     })
 
     const tracksResponse = await fetch(
@@ -223,42 +196,52 @@ export const getSpotifyTrackRecommendations = async (
       }
     )
     const tracksData = await tracksResponse.json()
-    console.log(tracksData)
-    return tracksData
+
+    return tracksData.tracks as SpotifyTrack[]
   } catch (error) {
+    if ((error as SpotifyError).status === 401) {
+    }
     console.error(error)
-    return null
+    return undefined
   }
 }
 
 export const createSpotifyPlaylist = async (
   accessToken: string,
-  userId: string,
   playlistName: string,
   playlistDescription: string,
   isPublic: boolean
-) => {
+): Promise<SpotifyPlaylist | undefined> => {
   try {
-    const createPlaylistResponse = await fetch(
-      `https://api.spotify.com/v1/users/${userId}/playlists`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({
-          name: playlistName,
-          description: playlistDescription,
-          public: isPublic,
-        }),
-      }
-    )
-    const playlistData = await createPlaylistResponse.json()
-    console.log(playlistData)
-    return playlistData
+    const meResponse = await fetch('https://api.spotify.com/v1/me', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    })
+    const meData = await meResponse.json()
+
+    if (meData) {
+      const createPlaylistResponse = await fetch(
+        `https://api.spotify.com/v1/users/${meData.id}/playlists`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            name: playlistName,
+            description: playlistDescription,
+            public: isPublic,
+          }),
+        }
+      )
+      const playlistData = await createPlaylistResponse.json()
+      return playlistData
+    }
+    return undefined
   } catch (error) {
     console.error(error)
-    return null
+    return undefined
   }
 }
 
@@ -266,7 +249,7 @@ export const addSpotifyTracksToPlaylist = async (
   accessToken: string,
   playlistId: string,
   trackUris: string[]
-) => {
+): Promise<string | undefined> => {
   try {
     const addTracksResponse = await fetch(
       `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
@@ -281,10 +264,9 @@ export const addSpotifyTracksToPlaylist = async (
       }
     )
     const addTracksData = await addTracksResponse.json()
-    console.log(addTracksData)
-    return addTracksData
+    return addTracksData.snapshot_id
   } catch (error) {
     console.error(error)
-    return null
+    return undefined
   }
 }
