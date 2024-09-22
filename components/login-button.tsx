@@ -4,8 +4,8 @@ import { Button } from './ui/button'
 import { FaSpotify } from 'react-icons/fa6'
 import { createClient } from '@/utils/supabase/client'
 
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
+const defaultUrl = process.env.NEXT_PUBLIC_VERCEL_URL
+  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
   : 'http://localhost:3000'
 
 const handleSpotifyLogin = async () => {
