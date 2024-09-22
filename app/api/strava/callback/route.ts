@@ -1,9 +1,5 @@
 import { NextResponse } from 'next/server'
-import {
-  calculateAverageCadence,
-  getStravaActivities,
-  getStravaTokens,
-} from '@/app/actions'
+import { getStravaTokens } from '@/app/actions'
 
 export async function GET(request: Request) {
   // The `/auth/callback` route is required for the server-side auth flow implemented

@@ -29,10 +29,8 @@ import {
   CardTitle,
 } from './ui/card'
 import { useToast } from '@/components/hooks/use-toast'
-import { ToastAction } from './ui/toast'
-import Link from 'next/link'
 import { createClient } from '@/utils/supabase/client'
-import { redirect, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 
 export default function CreatePlaylist({
   spotifyAccessToken,
