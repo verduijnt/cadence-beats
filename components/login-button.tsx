@@ -11,6 +11,8 @@ const defaultUrl = process.env.VERCEL_URL
 const handleSpotifyLogin = async () => {
   const supabase = createClient()
 
+  console.log(defaultUrl)
+
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'spotify',
     options: {
