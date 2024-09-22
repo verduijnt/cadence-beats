@@ -4,6 +4,10 @@ import { Button } from './ui/button'
 import { FaSpotify } from 'react-icons/fa6'
 import { createClient } from '@/utils/supabase/client'
 
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : 'http://localhost:3000'
+
 const handleSpotifyLogin = async () => {
   const supabase = createClient()
 
@@ -12,7 +16,7 @@ const handleSpotifyLogin = async () => {
     options: {
       scopes:
         'user-read-private user-read-email playlist-modify-public playlist-modify-private',
-      redirectTo: 'http://localhost:3000/auth/callback?next=/dashboard', // Redirect after login
+      redirectTo: `${defaultUrl}/auth/callback?next=/dashboard`, // Redirect after login
     },
   })
   if (error) {
